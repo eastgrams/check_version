@@ -1,0 +1,110 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <script>
+    </script>
+    </head>
+    <body>
+    <ul>
+        <li>Java : <span id="java_version">Wait...</span> </li>
+        <li>Python : <span id="python_version">Wait...</span> </li>
+        <li>PHP : <span id="php_version">Wait...</span> </li>
+    </ul>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+    ;(function($){
+        var siteData = {
+            java : function(data,callback){
+                var result = [];
+                var html = $("<html>").html(data);
+                var version = html.find("div.hm1w6 > ul > li > a");
+                if(version.length>0){
+                    result.push($(version[0]).text());
+                }
+                if(callback){
+                    callback(result);
+                }
+            },
+            python : function(data,callback){
+                var result = [];
+                var html = $("<html>").html(data);
+                var version = html.find("div.download-os-windows > p.download-buttons > a");
+                for(var i=0; i < version.length; i++ ){
+                    result.push($(version[i]).text());
+                }
+                if(callback){
+                    callback(result);
+                }
+            },
+            php : function(data,callback){
+                var result = [];
+                var html = $("<html>").html(data);
+                var version = html.find("div.download > ul > li");
+                for(var i=0; i < version.length; i++ ){
+                    var link = $(version[i]).find("a")[0];
+                    result.push($(link).text());
+                }
+                if(callback){
+                    callback(result);
+                }
+            }
+        };
+
+        function getJavaVersion(){
+            $.post("getdata.php?site=java",function(ret){
+                siteData["java"](ret,function(result){
+                    if(result.length>0){
+                        $("#java_version").text(result[0]);
+                    }
+                });
+            });
+        }
+
+        function getPythonVersion(){
+            $.post("getdata.php?site=python",function(ret){
+                siteData["python"](ret,function(result){
+                    if(result.length>0){
+                        var text = "";
+                        for(var i=0; i < result.length;i++){
+                            if(text!=""){
+                                text += " , ";
+                            }
+                            text +=  result[i];
+                        }
+                        $("#python_version").text(text);
+                    }
+                });
+            });
+        }
+
+        function getPhpVersion(){
+            $.post("getdata.php?site=php",function(ret){
+                siteData["php"](ret,function(result){
+                    if(result.length>0){
+                        var text = "";
+                        for(var i=0; i < result.length;i++){
+                            if(text!=""){
+                                text += " , ";
+                            }
+                            text +=  result[i];
+                        }
+                        $("#php_version").text(text);
+                    }
+                });
+            });
+        }
+
+        $(document).ready(function(){
+            getJavaVersion();
+            getPythonVersion();
+            getPhpVersion();
+        });
+    })(jQuery);
+    </script>
+    </body>
+</html>
